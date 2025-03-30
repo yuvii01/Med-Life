@@ -3,12 +3,17 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Context } from '../../Context/MainContext';
-import { useSelector } from 'react-redux';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { dbToCart } from '../../Reducers/cartSlice';
 
 
 const ThankYou = () => {
+    const dispatcher = useDispatch();
     const user = useSelector(store => store.user);
-
+    useEffect(() => {
+        dispatcher(dbToCart())
+    } , [])
     const { order_id } = useParams();
     const { API_BASE_URL, CART_ORDER_URL } = useContext(Context);
 

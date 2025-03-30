@@ -1,79 +1,100 @@
-import React, { useEffect, useState } from 'react';
-import Container from '../Container';
-import { IoMdArrowDropdown } from "react-icons/io";
-import { FaRegUser } from "react-icons/fa";
-import { CiShoppingCart } from "react-icons/ci";
-import { FaSearch } from "react-icons/fa";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { Link, useNavigate } from 'react-router-dom';
-import { IoClose } from "react-icons/io5";
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../Reducers/UserSlice';
-import { emptyCart } from '../../Reducers/cartSlice';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { CiSearch } from "react-icons/ci";
+import { FaLanguage } from "react-icons/fa";
 
 const Header = () => {
+  const cart = useSelector((store) => store.cart);
+  const user = useSelector((store) => store.user);
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false); // State to toggle dropdown visibility
 
-    const [toggle, setToggle] = useState(false);
-    const dispatcher = useDispatch();
-    const cart = useSelector(store => store.cart);
-    const navigate = useNavigate() ;
-    function convertTimestampToDate() {
-      const now = new Date();
+  const convertTimestampToDate = () => {
+    const now = new Date();
+    const weekday = now.toLocaleString('en-US', { weekday: 'short' });
+    const month = now.toLocaleString('en-US', { month: 'short' });
+    const day = now.getDate();
+    const year = now.getFullYear();
+    return `${weekday} ${month} ${day} ${year}`;
+  };
 
-      // Format the date components
-      const weekday = now.toLocaleString('en-US', { weekday: 'short' });
-      const month = now.toLocaleString('en-US', { month: 'short' });
-      const day = now.getDate();
-      const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-  
-      // Combine them into the desired format
-      return `${weekday} ${month} ${day} ${year}`;
-  }
-
-    const user = useSelector(store => store.user);
-    
-    return (
-        <header className=' sticky top-0 bg-white z-[9999999999] pt-10 px-10'>
-     <div className="flex items-center justify-between mb-6">
-        <div>
-        {user && user.data ? (
-        <h1 className="text-2xl font-semibold text-gray-800">
-            Hey, <span className="text-indigo-600">{user.data.name}</span> 👋
-        </h1>
-    ) : (
-        <h1 className="text-2xl font-semibold text-gray-800">
-            <span className="text-indigo-600">Login...</span> 👋
-        </h1>
-    )}
-    <p className="text-gray-500">
-        {user && user.data ? `Today, ${
-            convertTimestampToDate()
-          }` : ''}
-    </p>
-        </div>
-        <h2 onClick={() => {
-          navigate('buy_medicine')
-        }} className="text-xl font-semibold text-gray-800 ps-[700px]">
-            <span className="text-indigo-600">Buy Medicines 💊</span> 
-        </h2>
-        <div>
-
-        </div>
-        <div className="flex items-center space-x-6">
-         { user && user.data ? <button className="scale-200 bg-gray-100 rounded-full">
+  return (
+    <header className="sticky top-0 bg-white z-50 p-4 md:p-6 shadow-md">
+      <div className="flex items-center justify-between">
+        {/* Left Section: User Photo and Greeting */}
+        <div className="flex items-center space-x-4">
+          {user && user.data ? (
             <img
               src={`http://localhost:5000/image/profile/${user.data.Image}`}
               alt="User"
-              className="rounded-full w-[70px] h-[70px]"
+              className="rounded-full w-10 h-10 cursor-pointer"
+              onClick={() => navigate('/')}
             />
-          </button> : <button></button>  }
-          <button className="p-2 bg-gray-100 rounded-full">
+          ) : (
+            <div className="rounded-full w-10 h-10 bg-gray-200"></div>
+          )}
+          <div>
+            <h1 className="text-sm font-medium text-gray-800">
+              Welcome back,{' '}
+              <span className="text-[#205781]">
+                {user && user.data ? user.data.name : 'Guest'}
+              </span>
+            </h1>
+            <p className="text-xs text-gray-500">
+              {user && user.data ? `Today, ${convertTimestampToDate()}` : ''}
+            </p>
+          </div>
+        </div>
+
+        {/* Right Section: Search and Notification Icons */}
+        <div className="flex items-center space-x-4">
+        <button
+            onClick={() => setShowDropdown(!showDropdown)} // Toggle dropdown visibility
+            className="p-2 bg-gray-100 rounded-full"
+          >
+            <CiSearch className="text-xl font-semibold" />
+          </button>
+
+          {showDropdown && (
+            <div className="absolute right-[10px] mt-[180px] w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+              <ul className="py-2">
+                <li
+                  onClick={() => {navigate('/buy_medicine')
+                    setShowDropdown(!showDropdown)}
+                  }
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                >
+                  Buy Medicines
+                </li>
+                <li
+                  onClick={() => {
+                    window.location.href = 'http://localhost:8501/';
+                    setShowDropdown(!showDropdown);
+                  }}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                >
+                  Quick Tests
+                </li>
+                <li
+                  onClick={() => {navigate('/doctors')
+                    setShowDropdown(!showDropdown)}
+                  }
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                >
+                  Looking for Doctors
+                </li>
+              </ul>
+            </div>
+          )}
+
+          <button
+            onClick={() => console.log('Notifications clicked')}
+            className="p-2 bg-gray-100 rounded-full"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-gray-600"
+              className="w-5 h-5 text-gray-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -82,16 +103,14 @@ const Header = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0m6 0H9"
               />
             </svg>
           </button>
         </div>
       </div>
-
-    
-        </header >
-    );
-}
+    </header>
+  );
+};
 
 export default Header;

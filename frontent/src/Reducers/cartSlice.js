@@ -9,11 +9,15 @@ const CartSlice = createSlice(
         },
         reducers: {
             dbToCart(currentState, { payload }) {
-                currentState.data = payload.data;
-                currentState.total = payload.total;
-                localStorage.setItem("cart", JSON.stringify(currentState))
-
-            },
+                if (payload && payload.data) {
+                    currentState.data = payload.data;
+                    currentState.total = payload.total;
+                    localStorage.setItem("cart", JSON.stringify(currentState));
+                } else {
+                    console.error("Invalid payload structure:", payload);
+                }
+            } ,
+            
             addToCart(currentState, { payload }) {
                 const d = currentState.data.find(cart => cart.pId === payload.pId)
                 if (d) {

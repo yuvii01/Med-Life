@@ -1,11 +1,43 @@
 import React, { useContext, useState, useEffect } from "react";
 import Select, { components } from "react-select";
 import { Context } from "../../Context/MainContext";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../../Reducers/cartSlice';
+import axios from 'axios';
 
 const MedicineBuyingPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);  // New loading state
-  const { category, fetchCategory, products, fetchProduct } = useContext(Context);
+  const { category, fetchCategory, products, fetchProduct  , productImageUrl, API_BASE_URL, CART_BASE_URL} = useContext(Context);
+  console.log("products are", products);
+  const dispatcher = useDispatch();
+  const user = useSelector(store => store.user);
+  const addToDbCart = (pId) => {
+    if (user.data != null) {
+        axios.post(API_BASE_URL + CART_BASE_URL + "/add-to-cart", { user_id: user.data._id })
+            .then(
+                (success) => {
+                  
+                }
+            ).catch(
+                (error) => {
+
+                }
+            )
+    } else {
+
+    }
+}
+
+
+
+  const links = [
+    {
+      "tata" : "https://www.1mg.com/drugs/crocin-advance-500mg-tablet-600468" ,
+      "appolo" : "https://www.apollopharmacy.in/otc/pacimol-650mg-tablet?doNotTrack=true" ,
+    }
+  ]
+
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -15,7 +47,7 @@ const MedicineBuyingPage = () => {
     };
 
     fetchCategories();
-  }, [fetchCategory]);
+  }, []);
 
   // Transform categories into select-compatible options
   const categoryOptions = category.map((cat) => ({
@@ -26,8 +58,8 @@ const MedicineBuyingPage = () => {
 
   // Filter products based on the selected category
   const filteredProducts = selectedCategory
-    ? products.filter((product) => product.categoryId === selectedCategory)
-    : [];
+    ? products.filter((product) => product.category_id._id === selectedCategory) // Compare with categoryId
+    : products;
 
   // Custom component for dropdown options
   const CustomOption = (props) => {
@@ -64,51 +96,88 @@ const MedicineBuyingPage = () => {
   };
 
   const handleCategoryChange = (selected) => {
-    setSelectedCategory(selected?.value || null);
+    console.log("selected category:", selected);
+    setSelectedCategory(selected?.value || null);  // Store category id instead of label
   };
 
   if (loading) {
     return <div>Loading categories...</div>;  // Show loading message while fetching categories
   }
-
+  
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Buy Medicines</h1>
-      <div className="mb-6">
-        <Select
-          options={categoryOptions}
-          onChange={handleCategoryChange}
-          value={categoryOptions.find((cat) => cat.value === selectedCategory)} // Ensure the correct category is selected
-          placeholder="Select a category"
-          components={{ Option: CustomOption, SingleValue: CustomSingleValue }}
-        />
-      </div>
+    <div className="p-6 max-w-6xl mx-auto">
+  <h1 className="text-3xl font-bold mb-6 text-center">
+    Buy Medicines from Trusted Sources
+  </h1>
+  <div className="mb-6">
+    <Select
+      options={categoryOptions}
+      onChange={handleCategoryChange}
+      value={categoryOptions.find((cat) => cat.value === selectedCategory)} // Ensure the correct category is selected
+      placeholder="Select a category"
+      components={{ Option: CustomOption, SingleValue: CustomSingleValue }}
+    />
+  </div>
 
-      {selectedCategory && filteredProducts.length > 0 ? (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Products for {categoryOptions.find((cat) => cat.value === selectedCategory)?.label}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl shadow-md p-4">
-                <h3 className="text-lg font-bold">{product.name}</h3>
-                <p className="text-gray-600">Price: {product.price}</p>
-                <button className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                  Add to Cart
-                </button>
+  {filteredProducts.length > 0 ? (
+    <div>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+        {selectedCategory
+          ? categoryOptions.find((cat) => cat.value === selectedCategory)?.label
+          : "Popular Medicines"}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+        {filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
+          >
+            {/* Medicine Header */}
+            <div className="flex items-center mb-4">
+              <img
+                src={`http://localhost:5000/image/product/${product.image}`}
+                alt={product.name}
+                className="w-20 h-20 object-cover rounded-lg mr-4"
+              />
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Price: <span className="font-medium">{product.price}</span>
+                </p>
               </div>
-            ))}
+            </div>
+
+            {/* Trusted Sources */}
+            <div className="flex space-x-4 items-center mt-4">
+              <div className="w-12 h-12 overflow-hidden rounded-full">
+                <img
+                  src="/1mg.png"
+                  alt="1mg"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="w-12 h-12 overflow-hidden rounded-full">
+                <img
+                  src="/appolo.png"
+                  alt="Apollo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <p className="text-gray-500">
-          {selectedCategory
-            ? "No products available for the selected category."
-            : "Please select a category to see the products."}
-        </p>
-      )}
+        ))}
+      </div>
     </div>
+  ) : (
+    <p className="text-gray-500 text-center">
+      {selectedCategory
+        ? "No products available for the selected category."
+        : "Please select a category to see the products."}
+    </p>
+  )}
+</div>
   );
 };
 

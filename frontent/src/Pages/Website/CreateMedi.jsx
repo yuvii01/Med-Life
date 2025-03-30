@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { FileUploader } from 'react-drag-drop-files';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const CreateMedi = () => {
+  const user = useSelector(store => store.user);
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -31,22 +33,27 @@ const CreateMedi = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(e.target.date.value) ;
     const mediData = new FormData();
     mediData.append('name', formData.name);
     mediData.append('quantity', formData.quantity);
     mediData.append('timing', formData.timing);
+    mediData.append('date', e.target.date.value);
+    mediData.append('user_id', user?.data._id);
+    console.log("user id is" , user.data._id) ;
+
     mediData.append('description', formData.description);
     if (file) mediData.append('image', file);
 
+
     try {
-      const response = await axios.post('/api/medi', mediData, {
+      const response = await axios.post('http://localhost:5000/api/medi', mediData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      alert('Medi created successfully!');
-      console.log(response.data);
-      navigate('/medi-list');
+      
+      navigate('/');
     }
     catch (error) {
       console.error('Error creating Medi:', error);
@@ -103,6 +110,23 @@ const CreateMedi = () => {
           </div>
 
           
+
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium leading-6 text-gray-900">
+              Date
+            </label>
+            <div className="mt-2">
+              <input
+                id="date"
+                name="date"
+                type="date"
+                placeholder="Enter Medi Date"
+                required
+                className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
 
           <div>
             <label htmlFor="timing" className="block text-sm font-medium leading-6 text-gray-900">

@@ -9,8 +9,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const user = useSelector(store => store.user);
-
     const cart = useSelector(store => store.cart);
+    console.log(cart);
     const navigator = useNavigate();
     const dispatcher = useDispatch();
     const { products, productImageUrl, API_BASE_URL, fetchProduct, CART_BASE_URL } = useContext(Context);

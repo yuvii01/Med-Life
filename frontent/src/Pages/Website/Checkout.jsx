@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Context } from '../../Context/MainContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { emptyCart } from '../../Reducers/cartSlice';
+import { dbToCart, emptyCart } from '../../Reducers/cartSlice';
 import useRazorpay from 'react-razorpay'
 
 
@@ -23,6 +23,40 @@ const Checkout = () => {
         }, []
     )
 
+    const fn = async() => {
+        try {
+            // Loop through each item in the cart
+            for (let i = 0; i < cart.data.length; i++) {
+              const data = cart.data[i];
+              
+              const user_id = user.data._id ;
+              const prod_id = data.pId ;
+              console.log("aasli aasl" , user ,prod_id ) 
+              
+              const response = await axios.delete(
+                `http://localhost:5000/cart/remove-from-cart`,
+                {
+                  params: {
+                    user_id: user_id,
+                    prod_id: prod_id,
+                  },
+                }
+              );
+              
+              if (response.data.status === 1) {
+                console.log("Checkout successful");
+                navigator("/"); // Navigate to the desired route
+              } else {
+                console.log("Checkout failed");
+              }
+            } 
+            }
+          
+          
+          catch (error) {
+            console.error("Error removing item from cart:", error);
+          }
+    }
 
     useEffect(
         () => {
@@ -71,19 +105,19 @@ const Checkout = () => {
                 (success) => {
                     if (success.data.status == 1) {
 
-                        if (payment_mode == 1) {
-                            dispatcher(emptyCart())
-                            // const order = success.data.order_id;
-                            // + {order}
-                            navigator("/thank-you/" + success.data.order_id)
-                        } else {
+                        if (payment_mode == 2) {
                             initRazorpayOrder(
                                 success.data.order_id,
                                 order_total,
                                 success.data.razor_order.id,
                                 shipping_details
                             )
+                            
                         }
+                        dispatcher(emptyCart())
+                        
+                        fn() ;
+                        navigator("/thank-you/" + success.data.order_id) ;
                     }
                 }
             ).catch(

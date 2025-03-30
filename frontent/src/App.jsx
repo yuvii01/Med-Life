@@ -5,12 +5,9 @@ import Home from "./Pages/Website/Home";
 import Dashboard from "./Pages/Admin/Dashboard";
 import CategoryView from "./Pages/Admin/category/View";
 import ProductView from "./Pages/Admin/product/View";
-import ColorView from "./Pages/Admin/color/View";
-import ColorAdd from "./Pages/Admin/color/Add";
-import ColorEdit from "./Pages/Admin/color/Edit";
+
 import ProductAdd from "./Pages/Admin/product/Add"
 import ProductEdit from "./Pages/Admin/product/Edit"
-import Store from "./Pages/Website/Store";
 import Cart from "./Pages/Website/Cart";
 import LoginWeb from "./Pages/Website/Login"
 import SignUp from "./Pages/Website/Signup"
@@ -23,6 +20,9 @@ import Checkout from "./Pages/Website/Checkout";
 import ThankYou from "./Pages/Website/ThankYou";
 import CreateMedi from "./Pages/Website/CreateMedi";
 import MedicineBuyingPage from "./Pages/Website/MedicineBuyingPage";
+import Scan from "./Pages/Website/Scan";
+import Quick_tests from "./Pages/Website/Quick_tests";
+import Doctor from "./Pages/Website/Doctor";
 
 function App() {
   const dispatcher = useDispatch();
@@ -44,16 +44,18 @@ function App() {
           {
             path: "",
             element: <Home />
-          }, {
-            path: "store/:category_slug?",
-            element: <Store />
-          }
-           ,
+          }, 
            {
+            path: "scan",
+            element: <Scan />
+           }
+          ,
+          {
             path: "buy_medicine",
             element: <MedicineBuyingPage />
            }
-          , {
+           ,
+            {
             path: "cart",
             element: < Cart />
           }
@@ -61,6 +63,14 @@ function App() {
           {
             path: "create_medi",
             element: <CreateMedi />
+          } ,
+          {
+            path: "doctors",
+            element: <Doctor />
+          } ,
+          {
+            path: "quick_tests",
+            element: <Quick_tests />
           } ,
            {
             path: "my-profile",
@@ -105,18 +115,6 @@ function App() {
           }, {
             path: "product/edit/:id",
             element: <ProductEdit />
-          }
-          , {
-            path: "color",
-            element: <ColorView />
-          }
-          , {
-            path: "color/add",
-            element: <ColorAdd />
-          }
-          , {
-            path: "color/edit/:id",
-            element: <ColorEdit />
           }
         ]
       },
