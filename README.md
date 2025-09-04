@@ -42,7 +42,7 @@ Make sure you have installed:
 1. Clone the repository:  
 
 ```bash
-git clone https://github.com/your-username/med-life.git
+git clone https://github.com/yuvii01/Med-Life.git
 ```
 
 2. Navigate to the project folder and install dependencies:
@@ -83,3 +83,4 @@ http://localhost:3000
 📱 React Native app for mobile accessibility.
 
 🏥 Integration with nearby pharmacies for refill reminders.
+
